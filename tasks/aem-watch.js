@@ -9,7 +9,7 @@ var exec = require('child_process').exec,
 module.exports = function (grunt) {
 	'use strict';
 
-	grunt.registerMultitask('aem-watch', 'Upload watched files to an active AEM instance', function () {
+	grunt.registerMultiTask('aem-watch', 'Upload watched files to an active AEM instance', function () {
 		var cfg = {},
 			defaultServers = {
 				'author': {
