@@ -58,7 +58,6 @@ module.exports = function (grunt) {
 			requestObj = null,
 			requestObjForm = null,
 			server = '',
-			sourcePath = this.data.src,
 			targetPath = '',
 			validString = function (str, defaultValue) {
 				if (typeof str === 'string') {
@@ -85,24 +84,32 @@ module.exports = function (grunt) {
 		cfg.target = validString(options.target, cfg.target);
 		cfg.username = validString(options.username, cfg.username);
 
-		// Generate the target URL
-		targetPath = sourcePath.replace('jcr_root/', '');
-		requestCfg.url = 'http://'
-			+ cfg.username
-			+ ':'
-			+ cfg.password
-			+ '@'
-			+ cfg.host
-			+ (cfg.port !== '' ? ':' : '')
-			+ cfg.port
-			+ cfg.target
-			+ path.dirname(targetPath)
-			+ '.json';
+		this.files.forEach(function (file) {
+			file.src.forEach(function (sourcePath) {
+				var lastUpdate = fs.statSync(sourcePath).mtime.getTime(),
+					withinRange = lastUpdate > Date.now() - 10000;
 
-		// Make the request
-		requestObj = request(requestCfg, requestCallback).auth(cfg.username, cfg.password);
-		requestObjForm = requestObj.form();
-		requestObjForm.append('*', fs.createReadStream(sourcePath));
-        requestObjForm.append('@TypeHint', 'nt:file');
+				grunt.log.writeln(withinRange);
+				// Generate the target URL
+				targetPath = sourcePath.replace('jcr_root/', '');
+				requestCfg.url = 'http://'
+					+ cfg.username
+					+ ':'
+					+ cfg.password
+					+ '@'
+					+ cfg.host
+					+ (cfg.port !== '' ? ':' : '')
+					+ cfg.port
+					+ cfg.target
+					+ path.dirname(targetPath)
+					+ '.json';
+
+				// Make the request
+				requestObj = request(requestCfg, requestCallback).auth(cfg.username, cfg.password);
+				requestObjForm = requestObj.form();
+				requestObjForm.append('*', fs.createReadStream(sourcePath));
+				requestObjForm.append('@TypeHint', 'nt:file');
+			});
+		});
 	});
 };
