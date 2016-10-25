@@ -73,7 +73,7 @@ module.exports = function (grunt) {
 		// Start with a basic server configuration
 		server = validString(options.server);
 		if (server !== '') {
-			cfg = (typeof defaultServers[server] === 'object' && defaultServers(server) !== null ? defaultServers[server] : {});
+			cfg = (typeof defaultServers[server] === 'object' && defaultServers[server] !== null ? defaultServers[server] : {});
 		} else {
 			cfg = defaultServers['author'];
 		}
