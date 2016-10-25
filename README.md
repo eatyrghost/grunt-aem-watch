@@ -33,9 +33,9 @@ watch: {
 }
 ```
 ### Allowed Properties
-host - The host (without protocol or port) to call
-password - The password to use
-port - The port to use
-server - Optional set of default configurations, either 'author' or 'publish'
-target - The target path to use if not the same as the file location
-username - The username to use
+* host - The host (without protocol or port) to call
+* password - The password to use
+* port - The port to use
+* server - Optional set of default configurations, either 'author' or 'publish'
+* target - The target path to use if not the same as the file location
+* username - The username to use
