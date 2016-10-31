@@ -1,9 +1,10 @@
 /*global require:true, module:true */
 // Requires
-var exec = require('child_process').exec,
+var async = require('async'),
+	exec = require('child_process').exec,
 	moment = require('moment'),
+	needle = require('needle'),
 	path = require('path'),
-	request = require('request'),
 	fs = require('fs');
 
 // Declare the module
@@ -28,23 +29,47 @@ module.exports = function (grunt) {
 					'username': 'admin'
 				}
 			},
+			done = this.async(),
+			fileArray = [],
 			options = this.options(),
-			requestCallback = function (error, status, response) {
-				// Output our message
-				grunt.log.writeln(error);
-				grunt.log.writeln(status);
-				grunt.log.writeln(response);
-			},
-			requestCfg = {
-				'headers': {
-					'Accept': '*/*'
-				},
-				'method': 'POST'
-			},
-			requestObj = null,
-			requestObjForm = null,
+			requestData = {},
+			requestUrl = '',
 			server = '',
 			targetPath = '',
+			uploadFile = function (file) {
+				grunt.log.writeln('Uploading file', file);
+				// Generate the target URL
+				targetPath = file.replace('jcr_root/', '');
+				requestUrl = 'http://'
+					+ cfg.username
+					+ ':'
+					+ cfg.password
+					+ '@'
+					+ cfg.host
+					+ (cfg.port !== '' ? ':' : '')
+					+ cfg.port
+					+ cfg.target
+					+ path.dirname(targetPath);
+
+				// Generate the form data
+				requestData = {
+					'*': fs.createReadStream(file),
+					'@TypeHint': 'nt:file'
+				};
+
+				// Make the request
+				needle.post(requestUrl, requestData, {
+					'multipart': true
+				}).on('end', function () {
+					grunt.log.writeln('Uploaded file', file);
+				});
+			},
+			uploadedFile = function (error) {
+				if (error) {
+					grunt.fail.fatal(error);
+				}
+				done(error);
+			},
 			validString = function (str, defaultValue) {
 				if (typeof str === 'string') {
 					return str;
@@ -70,6 +95,7 @@ module.exports = function (grunt) {
 		cfg.target = validString(options.target, cfg.target);
 		cfg.username = validString(options.username, cfg.username);
 
+		// Find updated files only
 		this.files.forEach(function (file) {
 			file.src.forEach(function (sourcePath) {
 				var lastUpdate = fs.statSync(sourcePath).mtime.getTime(),
@@ -80,31 +106,16 @@ module.exports = function (grunt) {
 
 				// Only push the file if we are within our time range
 				if (withinRange === true) {
-					grunt.log.writeln('Uploading sourcePath:', sourcePath);
-					// Generate the target URL
-					targetPath = sourcePath.replace('jcr_root/', '');
-					requestCfg.url = 'http://'
-						+ cfg.username
-						+ ':'
-						+ cfg.password
-						+ '@'
-						+ cfg.host
-						+ (cfg.port !== '' ? ':' : '')
-						+ cfg.port
-						+ cfg.target
-						+ path.dirname(targetPath);
-
-					// Generate the form data
-					requestCfg.formData = {
-						'*': fs.createReadStream(sourcePath),
-						'@TypeHint': 'nt:file'
-					};
-
-					// Make the request
-					request.debug = true;
-					requestObj = request.post(requestCfg, requestCallback).auth(cfg.username, cfg.password);
+					fileArray.push(sourcePath);
 				}
 			});
 		});
+
+		// Upload the files
+		if (fileArray.length > 0) {
+			async.each(fileArray, uploadFile, uploadedFile);
+		} else {
+			done();
+		}
 	});
 };
