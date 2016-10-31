@@ -1,6 +1,7 @@
 /*global require:true, module:true */
 // Requires
 var exec = require('child_process').exec,
+	moment = require('moment'),
 	path = require('path'),
 	request = require('request'),
 	fs = require('fs');
@@ -29,29 +30,14 @@ module.exports = function (grunt) {
 			},
 			options = this.options(),
 			requestCallback = function (error, status, response) {
-				var consoleMessage = '',
-					responseObj = null,
-					statusCode = '201';
-
-				// Not throwing errors
-				if (error) {
-					consoleMessage = 'The upload failed.';
-				} else {
-					try {
-						responseObj = JSON.parse(response);
-						statusCode = validString(responseObj['status.code'], '201');
-						consoleMessage = statusCode + ': file uploaded successfully to ' + requestCfg.url; 
-					} catch (e) {
-						consoleMessage = 'There was an error reading the response.';
-					}
-				}
-
 				// Output our message
-				grunt.log.writeln(consoleMessage);
+				grunt.log.writeln(error);
+				grunt.log.writeln(status);
+				grunt.log.writeln(response);
 			},
 			requestCfg = {
 				'headers': {
-					'Accept': 'application/json'
+					'Accept': '*/*'
 				},
 				'method': 'POST'
 			},
@@ -87,28 +73,37 @@ module.exports = function (grunt) {
 		this.files.forEach(function (file) {
 			file.src.forEach(function (sourcePath) {
 				var lastUpdate = fs.statSync(sourcePath).mtime.getTime(),
-					withinRange = lastUpdate > Date.now() - 10000;
+					updateMoment = moment(lastUpdate),
+					currentTime = Date.now(),
+					currentMoment = moment(currentTime).seconds(-15),
+					withinRange = (updateMoment.isAfter(currentMoment));
 
-				grunt.log.writeln(withinRange);
-				// Generate the target URL
-				targetPath = sourcePath.replace('jcr_root/', '');
-				requestCfg.url = 'http://'
-					+ cfg.username
-					+ ':'
-					+ cfg.password
-					+ '@'
-					+ cfg.host
-					+ (cfg.port !== '' ? ':' : '')
-					+ cfg.port
-					+ cfg.target
-					+ path.dirname(targetPath)
-					+ '.json';
+				// Only push the file if we are within our time range
+				if (withinRange === true) {
+					grunt.log.writeln('Uploading sourcePath:', sourcePath);
+					// Generate the target URL
+					targetPath = sourcePath.replace('jcr_root/', '');
+					requestCfg.url = 'http://'
+						+ cfg.username
+						+ ':'
+						+ cfg.password
+						+ '@'
+						+ cfg.host
+						+ (cfg.port !== '' ? ':' : '')
+						+ cfg.port
+						+ cfg.target
+						+ path.dirname(targetPath);
 
-				// Make the request
-				requestObj = request(requestCfg, requestCallback).auth(cfg.username, cfg.password);
-				requestObjForm = requestObj.form();
-				requestObjForm.append('*', fs.createReadStream(sourcePath));
-				requestObjForm.append('@TypeHint', 'nt:file');
+					// Generate the form data
+					requestCfg.formData = {
+						'*': fs.createReadStream(sourcePath),
+						'@TypeHint': 'nt:file'
+					};
+
+					// Make the request
+					request.debug = true;
+					requestObj = request.post(requestCfg, requestCallback).auth(cfg.username, cfg.password);
+				}
 			});
 		});
 	});
