@@ -1,6 +1,6 @@
 {
   "name": "grunt-aem-watch",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A simple plug-in to upload files to an active AEM instance, recommended for use with grunt-contrib-watch.",
   "main": "index.js",
   "scripts": {
