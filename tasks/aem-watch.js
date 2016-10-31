@@ -37,6 +37,8 @@ module.exports = function (grunt) {
 			server = '',
 			targetPath = '',
 			uploadFile = function (file) {
+				var fileName = path.basename(file).toString();
+
 				grunt.log.writeln('Uploading file', file);
 				// Generate the target URL
 				targetPath = file.replace('jcr_root/', '');
@@ -53,13 +55,18 @@ module.exports = function (grunt) {
 
 				// Generate the form data
 				requestData = {
-					'*': fs.createReadStream(file),
-					'@TypeHint': 'nt:file'
+					'*': {
+						'file': file,
+						'content_type': 'text'
+					},
+					'*@TypeHint': 'nt:file'
 				};
 
 				// Make the request
 				needle.post(requestUrl, requestData, {
+					'json': true,
 					'multipart': true
+				}).on('readable', function () {
 				}).on('end', function () {
 					grunt.log.writeln('Uploaded file', file);
 				});
