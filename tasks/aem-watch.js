@@ -1,7 +1,6 @@
 /*global require:true, module:true */
 // Requires
 var async = require('async'),
-	exec = require('child_process').exec,
 	moment = require('moment'),
 	needle = require('needle'),
 	path = require('path'),
@@ -43,7 +42,7 @@ module.exports = function (grunt) {
 				// Generate the target URL
 				targetPath = file.replace('jcr_root/', '');
 				requestUrl = 'http://'
-					+ cfg.username
+					+ (cfg.username
 					+ ':'
 					+ cfg.password
 					+ '@'
@@ -51,7 +50,7 @@ module.exports = function (grunt) {
 					+ (cfg.port !== '' ? ':' : '')
 					+ cfg.port
 					+ cfg.target
-					+ path.dirname(targetPath);
+					+ path.dirname(targetPath)).replace('//', '/');
 
 				// Generate the form data
 				requestData = {

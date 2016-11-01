@@ -4,26 +4,50 @@
 ```
 aem-watch: {
 	localAuthor: {
-		server: 'author'
+		options: {
+			server: 'author'
+		},
+		src: [
+			'your/js/path/**/*.js',
+			'your/css/path/**/*.css',
+		]
 	},
 	localPublish: {
-		server: 'publish'
+		options: {
+			server: 'publish'
+		},
+		src: [
+			'your/js/path/**/*.js',
+			'your/css/path/**/*.css',
+		]
 	},
 	qaAuthor: {
-		host: 'qa-author.mydomain.com',
-		password: 'myqapassword',
-		server: 'author',
-		username: 'myqausername'
+		options: {
+			host: 'qa-author.mydomain.com',
+			password: 'myqapassword',
+			server: 'author',
+			username: 'myqausername'
+		},
+		src: [
+			'your/js/path/**/*.js',
+			'your/css/path/**/*.css',
+		]
 	},
 	qaPublish: {
-		host: 'qa-publish.mydomain.com',
-		password: 'myqapassword',
-		server: 'publish',
-		username: 'myqausername'
+		options: {
+			host: 'qa-publish.mydomain.com',
+			password: 'myqapassword',
+			server: 'publish',
+			username: 'myqausername'
+		},
+		src: [
+			'your/js/path/**/*.js',
+			'your/css/path/**/*.css',
+		]
 	}
 }
 ```
-... then from grunt-watch...
+... then your grunt-watch configuration...
 ```
 watch: {
 	your_task: {
@@ -32,10 +56,10 @@ watch: {
 	}
 }
 ```
-### Allowed Properties
-* host - The host (without protocol or port) to call
-* password - The password to use
-* port - The port to use
+### Allowed Options
+* host - The host (without protocol or port) to call, defaults to 'localhost'
+* password - The password to use, defaults to 'admin'
+* port - The port to use, defaults to '4502' for 'author' and '4503' for 'publish'
 * server - Optional set of default configurations, either 'author' or 'publish'
-* target - The target path to use if not the same as the file location
-* username - The username to use
+* target - The target path to use if not the same as the file location, e.g. if you need to prefix with '/etc/designs/your-design/' you would define that as your target
+* username - The username to use, defaults to 'admin'
