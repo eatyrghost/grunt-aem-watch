@@ -35,6 +35,7 @@ module.exports = function (grunt) {
 			requestUrl = '',
 			server = '',
 			targetPath = '',
+			updateWindow = 15,
 			uploadFile = function (file) {
 				var fileName = path.basename(file).toString();
 
@@ -100,6 +101,7 @@ module.exports = function (grunt) {
 		cfg.port = validString(options.port, cfg.port);
 		cfg.target = validString(options.target, cfg.target);
 		cfg.username = validString(options.username, cfg.username);
+		updateWindow = (isNaN(options.updateWindow) === false ? parseInt(options.updateWindow) : 15);
 
 		// Find updated files only
 		this.files.forEach(function (file) {
@@ -107,7 +109,7 @@ module.exports = function (grunt) {
 				var lastUpdate = fs.statSync(sourcePath).mtime.getTime(),
 					updateMoment = moment(lastUpdate),
 					currentTime = Date.now(),
-					currentMoment = moment(currentTime).seconds(-15),
+					currentMoment = moment(currentTime).seconds((0 - updateWindow)),
 					withinRange = (updateMoment.isAfter(currentMoment));
 
 				// Only push the file if we are within our time range

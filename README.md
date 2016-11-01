@@ -62,4 +62,5 @@ watch: {
 * port - The port to use, defaults to '4502' for 'author' and '4503' for 'publish'
 * server - Optional set of default configurations, either 'author' or 'publish'
 * target - The target path to use if not the same as the file location, e.g. if you need to prefix with '/etc/designs/your-design/' you would define that as your target
+* updateWindow - this allows you to specify, in seconds, how recently a file was updated to be eligible, defaults to 15
 * username - The username to use, defaults to 'admin'
