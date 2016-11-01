@@ -1,6 +1,6 @@
 # grunt-aem-watch
 ## aem-watch task
-### Usage:
+### Usage
 ```
 aem-watch: {
 	localAuthor: {
@@ -47,7 +47,7 @@ aem-watch: {
 	}
 }
 ```
-... then your grunt-watch configuration...
+... then your Grunt Watch configuration...
 ```
 watch: {
 	your_task: {
