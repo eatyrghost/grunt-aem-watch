@@ -36,12 +36,14 @@ module.exports = function (grunt) {
 			server = '',
 			targetPath = '',
 			updateWindow = 15,
+			replacePath = 'jrc_root/',
+			replacePathWith = '',
 			uploadFile = function (file) {
 				var fileName = path.basename(file).toString();
 
 				grunt.log.writeln('Uploading file', file);
 				// Generate the target URL
-				targetPath = file.replace('jcr_root/', '');
+				targetPath = file.replace(replacePath, replacePathWith);
 				requestUrl = 'http://'
 					+ (cfg.username
 					+ ':'
@@ -67,11 +69,13 @@ module.exports = function (grunt) {
 					'json': true,
 					'multipart': true
 				}).on('readable', function () {
-				}).on('end', function () {
+				}).on('finish', function () {
 					grunt.log.writeln('Uploaded file', file);
+					done();
 				});
 			},
 			uploadedFile = function (error) {
+				grunt.log.writeln('ueaaa');
 				if (error) {
 					grunt.fail.fatal(error);
 				}
@@ -94,6 +98,10 @@ module.exports = function (grunt) {
 		} else {
 			cfg = defaultServers['author'];
 		}
+
+		//Check if the targetPath has to be set up
+		replacePath = validString(options.replacePath, replacePath);
+		replacePathWith = validString(options.replacePathWith, replacePathWith);
 
 		// Read the rest of the options as configured by the developer
 		cfg.host = validString(options.host, cfg.host);
