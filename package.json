@@ -1,6 +1,6 @@
 {
-  "name": "grunt-aem-watch",
-  "version": "1.0.5",
+  "name": "grunt-aem-watch-nc",
+  "version": "1.0.6",
   "description": "A simple plug-in to upload files to an active AEM instance, recommended for use with grunt-contrib-watch.",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eatyrghost/grunt-aem-watch.git"
+    "url": "git+https://github.com/makiaji/grunt-aem-watch.git"
   },
   "keywords": [
     "grunt",
@@ -22,9 +22,9 @@
   "author": "eat yr Ghost",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/eatyrghost/grunt-aem-watch/issues"
+    "url": "https://github.com/makiaji/grunt-aem-watch/issues"
   },
-  "homepage": "https://github.com/eatyrghost/grunt-aem-watch#readme",
+  "homepage": "https://github.com/makiaji/grunt-aem-watch#readme",
   "dependencies": {
     "async": "^2.1.2",
     "grunt": "^1.0.1",
