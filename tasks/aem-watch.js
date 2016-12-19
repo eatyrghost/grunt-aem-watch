@@ -4,7 +4,8 @@ var async = require('async'),
 	moment = require('moment'),
 	needle = require('needle'),
 	path = require('path'),
-	fs = require('fs');
+	fs = require('fs'),
+	mime = require('mime');
 
 // Declare the module
 module.exports = function (grunt) {
@@ -36,12 +37,16 @@ module.exports = function (grunt) {
 			server = '',
 			targetPath = '',
 			updateWindow = 15,
+			replacePath = 'jrc_root/',
+			replacePathWith = '',
 			uploadFile = function (file) {
-				var fileName = path.basename(file).toString();
+				var fileName = path.basename(file).toString(),
+					mimeType = mime.lookup(file);
 
 				grunt.log.writeln('Uploading file', file);
+
 				// Generate the target URL
-				targetPath = file.replace('jcr_root/', '');
+				targetPath = file.replace(replacePath, replacePathWith);
 				requestUrl = 'http://'
 					+ (cfg.username
 					+ ':'
@@ -57,7 +62,7 @@ module.exports = function (grunt) {
 				requestData = {
 					'*': {
 						'file': file,
-						'content_type': 'text'
+						'content_type': mimeType
 					},
 					'*@TypeHint': 'nt:file'
 				};
@@ -67,8 +72,9 @@ module.exports = function (grunt) {
 					'json': true,
 					'multipart': true
 				}).on('readable', function () {
-				}).on('end', function () {
+				}).on('finish', function () {
 					grunt.log.writeln('Uploaded file', file);
+					done();
 				});
 			},
 			uploadedFile = function (error) {
@@ -94,6 +100,10 @@ module.exports = function (grunt) {
 		} else {
 			cfg = defaultServers['author'];
 		}
+
+		//Check if the targetPath has to be set up
+		replacePath = validString(options.replacePath, replacePath);
+		replacePathWith = validString(options.replacePathWith, replacePathWith);
 
 		// Read the rest of the options as configured by the developer
 		cfg.host = validString(options.host, cfg.host);
