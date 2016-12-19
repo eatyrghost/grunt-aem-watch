@@ -59,7 +59,7 @@ module.exports = function (grunt) {
 				requestData = {
 					'*': {
 						'file': file,
-						'content_type': 'text'
+						'content_type': 'text/css'
 					},
 					'*@TypeHint': 'nt:file'
 				};
@@ -75,7 +75,6 @@ module.exports = function (grunt) {
 				});
 			},
 			uploadedFile = function (error) {
-				grunt.log.writeln('ueaaa');
 				if (error) {
 					grunt.fail.fatal(error);
 				}
