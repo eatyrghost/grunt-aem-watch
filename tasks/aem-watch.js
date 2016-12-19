@@ -4,7 +4,8 @@ var async = require('async'),
 	moment = require('moment'),
 	needle = require('needle'),
 	path = require('path'),
-	fs = require('fs');
+	fs = require('fs'),
+	mime = require('mime');
 
 // Declare the module
 module.exports = function (grunt) {
@@ -39,9 +40,11 @@ module.exports = function (grunt) {
 			replacePath = 'jrc_root/',
 			replacePathWith = '',
 			uploadFile = function (file) {
-				var fileName = path.basename(file).toString();
+				var fileName = path.basename(file).toString(),
+					mimeType = mime.lookup(file);
 
 				grunt.log.writeln('Uploading file', file);
+
 				// Generate the target URL
 				targetPath = file.replace(replacePath, replacePathWith);
 				requestUrl = 'http://'
@@ -59,7 +62,7 @@ module.exports = function (grunt) {
 				requestData = {
 					'*': {
 						'file': file,
-						'content_type': 'text/css'
+						'content_type': mimeType
 					},
 					'*@TypeHint': 'nt:file'
 				};
